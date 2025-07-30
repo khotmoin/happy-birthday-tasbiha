@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Tasbiha</title>
+    
+    <!-- SEO and Social Media Meta Tags -->
+    <meta name="description" content="A special birthday message for my love, Tasbiha.">
+    <meta property="og:title" content="Happy Birthday, Tasbiha">
+    <meta property="og:description" content="A special birthday message for my love, Tasbiha.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Happy Birthday, Tasbiha">
+    <meta name="twitter:description" content="A special birthday message for my love, Tasbiha.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Love+Light&display=swap" rel="stylesheet">
+
+    <!-- Tone.js for Audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+
+    <style>
+        :root {
+            /* Color Palette */
+            --bg-color: #fff7f7; /* Soft pinkish white */
+            --primary-text: #4c3f3f; /* Soft dark brown */
+            --heading-color: #d6336c; /* Deep pink */
+            --accent-color: #f06595; /* Lighter pink */
+            --heart-color: #e64980;
+
+            /* Typography */
+            --font-heading: 'Love Light', cursive;
+            --font-body: 'Homemade Apple', cursive;
+
+            /* Spacing */
+            --spacing-base: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top left, rgba(240, 101, 149, 0.1), transparent 40%),
+                              radial-gradient(circle at bottom right, rgba(214, 51, 108, 0.1), transparent 50%);
+            color: var(--primary-text);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1.8;
+            font-size: 18px;
+        }
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.05"/></svg>');
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: calc(var(--spacing-base) * 12) 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(4rem, 15vw, 10rem);
+            font-weight: 300;
+            color: var(--heading-color);
+            line-height: 1;
+            animation: fadeIn 2s ease-out forwards;
+        }
+
+        .hero p {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            margin-top: calc(var(--spacing-base) * 2);
+            animation: fadeIn 2s 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .scroll-down {
+            position: absolute;
+            bottom: 32px;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-family: sans-serif;
+            font-weight: 300;
+            animation: bounce 2s infinite, fadeIn 2s 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        .chapter {
+            padding: calc(var(--spacing-base) * 8) 0;
+            margin-bottom: calc(var(--spacing-base) * 4);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(214, 51, 108, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s, transform 1s;
+        }
+        
+        .chapter-content {
+            padding: 0 calc(var(--spacing-base) * 5);
+        }
+
+        .chapter h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 10vw, 5rem);
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: calc(var(--spacing-base) * 4);
+            color: var(--heading-color);
+        }
+
+        .chapter p {
+            margin-bottom: calc(var(--spacing-base) * 3);
+            white-space: pre-wrap;
+            opacity: 0;
+        }
+        
+        .chapter p.visible {
+            opacity: 1;
+        }
+
+        .chapter p .word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(10px) rotateX(-90deg);
+            animation: revealWord 0.5s forwards;
+        }
+        
+        .final-message {
+            text-align: center;
+        }
+        
+        /* Mute Button */
+        #mute-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: transform 0.2s;
+        }
+        #mute-button:hover {
+            transform: scale(1.1);
+        }
+        #mute-button svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--heading-color);
+        }
+        .icon-unmuted, .icon-muted {
+            display: none;
+        }
+        #mute-button.muted .icon-muted { display: block; }
+        #mute-button:not(.muted) .icon-unmuted { display: block; }
+
+        /* Song Player */
+        #song-chapter .chapter-content {
+            text-align: center;
+        }
+        .music-player {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: calc(var(--spacing-base) * 3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            width: 80%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #play-button {
+            width: 60px;
+            height: 60px;
+            background: var(--heading-color);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            opacity: 0.5;
+        }
+        #play-button.ready {
+            opacity: 1;
+        }
+        #play-button.ready:hover {
+            transform: scale(1.1);
+        }
+        #play-button svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 3;
+            fill: white;
+        }
+        .icon-play { display: block; }
+        .icon-pause { display: none; }
+        #play-button.playing .icon-play { display: none; }
+        #play-button.playing .icon-pause { display: block; }
+
+        .song-info {
+            margin-top: calc(var(--spacing-base) * 2);
+        }
+        .song-title {
+            font-family: var(--font-body);
+            font-size: 1.5rem;
+            color: var(--heading-color);
+        }
+        .song-artist {
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--primary-text);
+        }
+
+        /* Reasons Section */
+        #reasons-chapter .chapter-content {
+            text-align: center;
+        }
+        #reasons-list {
+            margin-bottom: calc(var(--spacing-base) * 4);
+            min-height: 50px;
+        }
+        .reason-text {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            color: var(--heading-color);
+            margin: calc(var(--spacing-base) * 2) 0;
+            opacity: 0;
+            animation: fadeInReason 1s forwards;
+        }
+        #reason-button {
+            font-family: var(--font-body);
+            font-size: 1.2rem;
+            color: var(--primary-text);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--accent-color);
+            padding: calc(var(--spacing-base) * 1.5) calc(var(--spacing-base) * 3);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #reason-button:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        #reason-button:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        /* Final Secret */
+        .final-secret {
+            text-align: center;
+            padding: calc(var(--spacing-base) * 10) 0;
+        }
+        .glowing-heart {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            cursor: pointer;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        .glowing-heart::before, .glowing-heart::after {
+            content: "";
+            position: absolute;
+            left: 25px;
+            top: 0;
+            width: 25px;
+            height: 40px;
+            background: var(--heart-color);
+            border-radius: 25px 25px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        .glowing-heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        #secret-message {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s, transform 1s;
+            margin-top: calc(var(--spacing-base) * 4);
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: var(--heading-color);
+        }
+        #secret-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInReason {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes revealWord {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(214, 51, 108, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(214, 51, 108, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(214, 51, 108, 0); }
+        }
+        
+        @media (max-width: 768px) {
+            body { font-size: 16px; }
+            .chapter-content { padding: 0 calc(var(--spacing-base) * 3); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mute-button" class="muted">
+        <svg class="icon-unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+    </div>
+
+    <canvas id="hearts-canvas" style="position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none;"></canvas>
+
+    <header class="hero">
+        <h1>Happy Birthday Tasbiha</h1>
+        <p>My Love, My Life, My Everything</p>
+        <div class="scroll-down">Scroll to read my heart</div>
+    </header>
+
+    <main class="container">
+        
+        <section class="chapter" id="chapter1">
+            <div class="chapter-content">
+                <p>I looooooovvvvvveeeee yoooooooooouuuuuuuuuuuu soooooooooooooooooooooo fuckkkkkkkkkiiiinnngggggggg muchhhhhhhhhhhhhhhhhhhh babbbbyyyyyyyyyyyyy buuubbbbbbuuuuuuuu buuuttttkkkkkkii muuuuttttttkkkkiiiiiii fuuuuuuttttttttkkkkkkiii bubuuuuuuu rannnniiiiiii ki bacchiii</p>
+            </div>
+        </section>
+
+        <section class="chapter" id="chapter2">
+            <div class="chapter-content">
+                <h2>My Lucky Star</h2>
+                <p>Kismat wala tou hu mai mujhe aise pyaari Bibi mili. Auro ke bibiya jaisi hoti toh kabki ghusse se chhol chhal ke kisi aur lalke ke sath chali gayi hoti.
+
+Hehehe
+
+Par meri bubu sabse pyaari hai. Kabhi kabhi ghussa karti hai, apne ko hirwin samjhti hai, don samjhti hai. Darti toh kisise nahi hai bhaisaab...
+
+Heheheh</p>
+            </div>
+        </section>
+
+        <section class="chapter" id="chapter3">
+            <div class="chapter-content">
+                <h2>Our Story</h2>
+                <p>Kaha se start karu wohi nahi samjh raha kyuki bohot kuch hai kehne aur kya kya kahu samjh nahi raha 🥺 Kehkar bhi kya kya hi keh sakta hu, sab toh nahi bata sakta na, umar beet jaayegi 🥺
+
+Thank you for coming into my life. Aapko maine first time message karke barabar <span id="animated-counter">444</span> days, 4 hours, 8 minutes hue hai (12 am tak - late padh rahe ho toh aur kuch minutes add karlo hehehe). Matlab aap itna time mere life mei rahe ho. Mujhe jhelne ke liye bohot bohot shukriya.
+
+I know thode nakhre hai, I know thoda ghussa hota, I know thoda daantta, but ye sab karta because I loooovvveeeee youuu a looottttttttt! 😭 I loooovvveeeee youuu sooo soooo soooooo soooooo much 🤍
+
+Ab 3 months se bhi kam time bacha hai 🫠 fir hum sath hoge humesha ke liye. Bore mat ho jaana mujhse 🙂‍↔️ Ho gaye fir bhi kuch kar nahi paoge hihihi 😁 ab fas gaye ho, no option left</p>
+            </div>
+        </section>
+        
+        <section class="chapter" id="chapter4">
+            <div class="chapter-content">
+                <h2>How You Changed Me</h2>
+                <p>Alhamdulillah, aap life mei aakar sab theek kar diye 🫠 jabse aap aaye life mei sab accha sa lagne laga hai 🥹🥹
+
+Jo banda itna reserved tha, kisike samne basic emotions dikha nahi paaya kabhi, wo aapke samne ek open book ke tarah hai 😂 Itna vulnerable kabhi nahi raha kisike samne, and you made me comfortable even in such state.
+
+Aapko idea tak nahi hai ke how much you have changed me for good. Seriously, you have no idea at all. Bataya bhi nahi hu aapko abtak. Careless, reckless banda tha jisko kabhi khudki khabar nahi thi. I try to improve every single thing about me just so I can be a better husband for you.
+
+The way you care about my overthinking and all 🤌🏻 I didn't even know ke it was possible to ask for it from someone, and aap toh haaye 😭</p>
+            </div>
+        </section>
+        
+        <section class="chapter" id="chapter5">
+            <div class="chapter-content">
+                <h2>My Promise & My Heart</h2>
+                <p>Thankkk youuu sooo much forrr everything
+
+Allah aapko humesha khush rakhe aur har wo cheez se nawaze jo aap deserve karte
+
+Mujhe seriously pata nahi kya hua hai... Kitne din hue, kuch likh hi nahi paa raha hu
+
+Kuch dino se thoda time kam de pata hu, but I hope you understand. Last 3 4 din toh ye banane busy tha, aur overall kaam bhi thoda zyada hi hai abhi. Because shaadi aa rahi hai so sab sort karna hai. Shaadi ke baad free rehna hai so. Again, sorry time nahi de pataa uske liye.
+
+Lekin ye jaan lo ke bas almost pure din aapke baare mei hi sochta 🥹 bas Tasbiha Tasbiha 🥰 Cuutttiiiieeee mere</p>
+            </div>
+        </section>
+        
+        <section class="chapter" id="chapter6">
+            <div class="chapter-content">
+                 <p class="final-message">I looooooovvvvvveeeeeeeee yoooooooooouuuuuuuuuuuu soooooooooooooooooooooo soooooooooooooooooooooo muchhhhhhhhhhhhhhhhhhhh babbbbyyyyyyyyyyyyy buuubbbbbbuuuuuuuu buuuttttkkkkkkii muuuuttttttkkkkiiiiiii fuuuuuuttttttttkkkkkkiii bubuuuuuuu rannnniiiiiii ki bacchiii heheheheeh
+
+Lucky toh hu mai jo aap mile. Bas kabhi kabhi galtiya ho jaati hai. Wo galtiyo ko maaf kardo apna baby samjhkar 🤭 I try to be the best husband possible, and I will keep trying. You mean the world to me.
+
+Aur kehna toh bohot kuch hai, but samjh nahi aa raha kya kahu, kya likhu (pata nahi kyu), toh abhi yahi rukh jaata hu.
+
+Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate every single thing you do for me 🤍 Thank you jaan for being such a wonderful friend, girlfriend, fiance and wife. 🤍 Thank you for thinking about me 🤍 Thank you for loving me 🤍 Thank you jaan for everything you do for me. 🤍 Thank you jaan for everything. 🤍</p>
+            </div>
+        </section>
+
+        <section class="chapter" id="song-chapter">
+            <div class="chapter-content">
+                <h2>Our Song</h2>
+                <div class="music-player">
+                    <button id="play-button">
+                        <svg class="icon-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    </button>
+                    <div class="song-info">
+                        <p class="song-title">Iraaday</p>
+                        <p class="song-artist">Abdul Hannan</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="chapter" id="reasons-chapter">
+            <div class="chapter-content">
+                <h2>A Few Reasons Why...</h2>
+                <div id="reasons-list"></div>
+                <button id="reason-button">Tell me a reason...</button>
+            </div>
+        </section>
+
+        <section class="final-secret">
+            <div id="secret-heart" class="glowing-heart"></div>
+            <p id="secret-message">You are my forever. ❤️</p>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Audio Context ---
+            let musicStarted = false;
+            let backgroundMusic, mainSongPlayer;
+            let visualizerMeter;
+            let isVisualizerPlaying = false;
+
+            const muteButton = document.getElementById('mute-button');
+            const playButton = document.getElementById('play-button');
+
+            // Initialize all audio components
+            const initAudio = async () => {
+                await Tone.start();
+
+                // Background Melody
+                backgroundMusic = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: 'fatsine' },
+                    envelope: { attack: 0.1, decay: 0.2, sustain: 0.5, release: 1 },
+                }).toDestination();
+                backgroundMusic.volume.value = -18;
+                const bgMelody = [['C4', 'E4', 'G4'], null, 'A4', null, ['G4', 'B3', 'D4'], null, 'E4', null];
+                new Tone.Sequence((time, note) => {
+                    if (note) backgroundMusic.triggerAttackRelease(note, '1n', time);
+                }, bgMelody, '1m').start(0);
+                
+                Tone.Transport.bpm.value = 70;
+                Tone.Transport.start();
+
+                // Main Song Player
+                visualizerMeter = new Tone.Meter();
+                mainSongPlayer = new Tone.Player({
+                    url: "https://archive.org/download/abdul-hannan-haider-ali-iraaday-official-audio/Abdul%20Hannan%2C%20Haider%20Ali%20-%20Iraaday%20%28Official%20Audio%29.mp3",
+                    loop: true,
+                    onload: () => {
+                        playButton.classList.add('ready');
+                        playButton.disabled = false;
+                    }
+                }).connect(visualizerMeter).toDestination();
+                mainSongPlayer.volume.value = 0;
+            };
+
+            const startInitialMusic = async () => {
+                if (!musicStarted) {
+                    await initAudio();
+                    musicStarted = true;
+                }
+                const isMuted = muteButton.classList.toggle('muted');
+                Tone.Master.mute = isMuted;
+            };
+
+            muteButton.addEventListener('click', startInitialMusic);
+            document.body.addEventListener('click', () => {
+                if (!musicStarted) startInitialMusic();
+            }, { once: true });
+
+            playButton.addEventListener('click', () => {
+                if (!musicStarted || !mainSongPlayer.loaded) return;
+                
+                const isPlaying = playButton.classList.toggle('playing');
+                isVisualizerPlaying = isPlaying;
+
+                if (isPlaying) {
+                    mainSongPlayer.start();
+                    backgroundMusic.volume.linearRampTo(-Infinity, 0.5); 
+                } else {
+                    mainSongPlayer.stop();
+                    if (!muteButton.classList.contains('muted')) {
+                       backgroundMusic.volume.linearRampTo(-18, 0.5);
+                    }
+                }
+            });
+
+            // --- Floating Hearts Canvas Animation ---
+            const canvas = document.getElementById('hearts-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let hearts = [];
+            const heartCount = 50;
+            let lastScrollY = window.scrollY;
+            let mouse = { x: null, y: null };
+
+            function newDrawHeart(x, y, size, color) {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                let topCurveHeight = size * 0.3;
+                ctx.moveTo(x, y + topCurveHeight);
+                ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
+                ctx.bezierCurveTo(x - size / 2, y + (size + topCurveHeight) / 2, x, y + (size + topCurveHeight) / 2, x, y + size);
+                ctx.bezierCurveTo(x, y + (size + topCurveHeight) / 2, x + size / 2, y + (size + topCurveHeight) / 2, x + size / 2, y + topCurveHeight);
+                ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            function createHearts() {
+                hearts = [];
+                for (let i = 0; i < heartCount; i++) {
+                    const baseSize = Math.random() * 20 + 10;
+                    hearts.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        baseSize: baseSize,
+                        size: baseSize,
+                        speedY: Math.random() * 0.5 + 0.2,
+                        speedX: Math.random() * 1 - 0.5,
+                        color: `rgba(230, 73, 128, ${Math.random() * 0.5 + 0.2})`
+                    });
+                }
+            }
+
+            function animateHearts() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const scrollDelta = window.scrollY - lastScrollY;
+                lastScrollY = window.scrollY;
+
+                let visualizerValue = -Infinity;
+                if (isVisualizerPlaying && visualizerMeter) {
+                    visualizerValue = visualizerMeter.getValue();
+                }
+
+                for (let i = 0; i < hearts.length; i++) {
+                    let dx = mouse.x - hearts[i].x;
+                    let dy = mouse.y - hearts[i].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) {
+                        hearts[i].x -= dx * 0.05;
+                        hearts[i].y -= dy * 0.05;
+                    }
+
+                    // Visualizer Pulse Effect
+                    if (isVisualizerPlaying && i % 3 === 0) {
+                        const pulse = Tone.dbToGain(visualizerValue) * 20;
+                        hearts[i].size = hearts[i].baseSize + pulse;
+                    } else {
+                        hearts[i].size = hearts[i].baseSize;
+                    }
+
+                    hearts[i].y -= hearts[i].speedY + (scrollDelta * 0.2);
+                    hearts[i].x += hearts[i].speedX;
+
+                    newDrawHeart(hearts[i].x, hearts[i].y, hearts[i].size, hearts[i].color);
+
+                    if (hearts[i].y < -hearts[i].size) {
+                        hearts[i].y = canvas.height + hearts[i].size;
+                        hearts[i].x = Math.random() * canvas.width;
+                    }
+                    if (hearts[i].x < -hearts[i].size || hearts[i].x > canvas.width + hearts[i].size) {
+                        hearts[i].speedX *= -1;
+                    }
+                }
+                requestAnimationFrame(animateHearts);
+            }
+
+            createHearts();
+            animateHearts();
+
+            // --- Event Listeners ---
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                createHearts();
+            });
+            
+            const updateMousePosition = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                let x, y;
+                if (e.touches) {
+                    x = e.touches[0].clientX - rect.left;
+                    y = e.touches[0].clientY - rect.top;
+                } else {
+                    x = e.clientX - rect.left;
+                    y = e.clientY - rect.top;
+                }
+                mouse.x = x;
+                mouse.y = y;
+            };
+
+            window.addEventListener('mousemove', updateMousePosition);
+            window.addEventListener('touchmove', updateMousePosition);
+            window.addEventListener('touchstart', updateMousePosition);
+
+            // --- Scroll-triggered Animations ---
+            const animateWords = (paragraph) => {
+                const text = paragraph.textContent;
+                paragraph.innerHTML = '';
+                const words = text.split(/(\s+)/);
+                
+                words.forEach((word, index) => {
+                    if (word.trim().length > 0) {
+                        const span = document.createElement('span');
+                        span.textContent = word;
+                        span.className = 'word';
+                        span.style.animationDelay = `${index * 0.05}s`;
+                        paragraph.appendChild(span);
+                    } else {
+                         paragraph.appendChild(document.createTextNode(word));
+                    }
+                });
+                paragraph.classList.add('visible');
+            };
+
+            const chapterObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const chapter = entry.target;
+                        chapter.style.opacity = '1';
+                        chapter.style.transform = 'translateY(0)';
+                        
+                        const paragraphs = chapter.querySelectorAll('p');
+                        paragraphs.forEach(p => {
+                            if (!p.classList.contains('visible')) {
+                                animateWords(p);
+                            }
+                        });
+                        
+                        if (chapter.id !== 'reasons-chapter' && chapter.id !== 'song-chapter') {
+                           observer.unobserve(chapter);
+                        }
+                    } else {
+                        // Stop visualizer when scrolling away
+                        if (entry.target.id === 'song-chapter' && isVisualizerPlaying) {
+                            playButton.click();
+                        }
+                    }
+                });
+            }, { threshold: 0.25 });
+
+            document.querySelectorAll('.chapter').forEach(chapter => {
+                chapterObserver.observe(chapter);
+            });
+            
+            // --- Animated Counter ---
+            const counterObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const target = parseInt(el.dataset.target, 10);
+                        let current = 0;
+                        const increment = target / 100;
+                        
+                        const updateCounter = () => {
+                            if (current < target) {
+                                current += increment;
+                                el.textContent = Math.ceil(current);
+                                requestAnimationFrame(updateCounter);
+                            } else {
+                                el.textContent = target;
+                            }
+                        };
+                        updateCounter();
+                        observer.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.8 });
+
+            const counterElement = document.getElementById('animated-counter');
+            if (counterElement) {
+                counterElement.dataset.target = counterElement.textContent;
+                counterElement.textContent = '0';
+                counterObserver.observe(counterElement);
+            }
+
+            // --- Reasons I Love You List ---
+            const reasons = [
+                "...because of the way you laugh at my silly jokes.",
+                "...for your kindness to everyone you meet.",
+                "...because you make even ordinary days feel special.",
+                "...for the way you care about my overthinking.",
+                "...because you made me comfortable enough to be an open book."
+            ];
+            let reasonIndex = 0;
+            const reasonButton = document.getElementById('reason-button');
+            const reasonsList = document.getElementById('reasons-list');
+
+            reasonButton.addEventListener('click', () => {
+                if (reasonIndex < reasons.length) {
+                    const p = document.createElement('p');
+                    p.textContent = reasons[reasonIndex];
+                    p.className = 'reason-text';
+                    reasonsList.appendChild(p);
+                    reasonIndex++;
+                }
+                
+                if (reasonIndex >= reasons.length) {
+                    reasonButton.textContent = 'The list is endless...';
+                    reasonButton.disabled = true;
+                }
+            });
+
+            // --- Final Secret Reveal ---
+            const secretHeart = document.getElementById('secret-heart');
+            const secretMessage = document.getElementById('secret-message');
+            secretHeart.addEventListener('click', () => {
+                secretMessage.classList.add('visible');
+                secretHeart.style.animation = 'none';
+                secretHeart.style.opacity = '0.5';
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
