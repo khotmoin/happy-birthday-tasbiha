@@ -230,6 +230,79 @@
             opacity: 0.7;
         }
 
+        /* Message in a Bottle Section */
+        #bottle-chapter {
+            overflow: hidden;
+            position: relative;
+            padding-bottom: 0;
+        }
+        .shoreline {
+            position: relative;
+            height: 250px;
+            background: linear-gradient(to top, rgba(240, 101, 149, 0.15), transparent);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .bottle {
+            width: 80px;
+            height: 150px;
+            position: relative;
+            cursor: pointer;
+            animation: bob 4s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+        .bottle-body {
+            width: 100%;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 40px 40px 5px 5px;
+            position: absolute;
+            bottom: 0;
+        }
+        .bottle-neck {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px 5px 0 0;
+            position: absolute;
+            top: -30px;
+            left: 25px;
+        }
+        .cork {
+            width: 20px;
+            height: 10px;
+            background: #a16207;
+            position: absolute;
+            top: -35px;
+            left: 30px;
+        }
+        .bottle.clicked {
+            animation: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .unrolled-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 90%;
+            padding: calc(var(--spacing-base) * 4);
+            background: var(--bg-color);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        .unrolled-message.visible {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
         /* Final Secret */
         .final-secret {
             text-align: center;
@@ -300,6 +373,12 @@
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(214, 51, 108, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(214, 51, 108, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(214, 51, 108, 0); }
+        }
+
+        @keyframes bob {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
         }
         
         @media (max-width: 768px) {
@@ -405,6 +484,32 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
             </div>
         </section>
 
+        <section class="chapter" id="bottle-chapter">
+            <div class="chapter-content">
+                <h2>A Message from the Future...</h2>
+                <div class="shoreline">
+                    <div class="bottle" id="message-bottle">
+                        <div class="bottle-body"></div>
+                        <div class="bottle-neck"></div>
+                        <div class="cork"></div>
+                    </div>
+                    <div class="unrolled-message" id="future-message">
+                        <p>My Dearest Tasbiha,
+                        <br><br>
+                        It’s me, writing to you from our future. It's been nine months since we got married, and as I sit here, I'm smiling thinking about the day you first read that birthday message.
+                        <br><br>
+                        Everything we dreamed of? It's all real. The late-night talks, the shared laughter in our own home... it's even better than we imagined. These first nine months have been the most beautiful chapter of my life.
+                        <br><br>
+                        Thank you for making our forever so magical.
+                        <br><br>
+                        All my love, always,
+                        <br>
+                        Your Husband</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="final-secret">
             <div id="secret-heart" class="glowing-heart"></div>
             <p id="secret-message">You are my forever. ❤️</p>
@@ -449,7 +554,6 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
             muteButton.addEventListener('click', toggleMusic);
             document.body.addEventListener('click', () => {
                 if (!musicStarted) {
-                   // Don't auto-play, just prepare the context. Let mute button handle play/pause.
                    initAudio();
                    musicStarted = true;
                 }
@@ -588,7 +692,7 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
                             }
                         });
                         
-                        if (chapter.id !== 'reasons-chapter') {
+                        if (chapter.id !== 'reasons-chapter' && chapter.id !== 'bottle-chapter') {
                            observer.unobserve(chapter);
                         }
                     }
@@ -656,6 +760,19 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
                     reasonButton.disabled = true;
                 }
             });
+
+            // --- Message in a Bottle Reveal ---
+            const bottle = document.getElementById('message-bottle');
+            const futureMessage = document.getElementById('future-message');
+            bottle.addEventListener('click', () => {
+                bottle.classList.add('clicked');
+                futureMessage.classList.add('visible');
+                // Also animate the words in this message
+                const futureP = futureMessage.querySelector('p');
+                if (!futureP.classList.contains('visible')) {
+                    animateWords(futureP);
+                }
+            }, { once: true });
 
             // --- Final Secret Reveal ---
             const secretHeart = document.getElementById('secret-heart');
