@@ -162,67 +162,37 @@
             text-align: center;
         }
         
-        /* Song Player */
-        #song-chapter .chapter-content {
-            text-align: center;
-        }
-        .music-player {
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 16px;
-            padding: calc(var(--spacing-base) * 3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            width: 80%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        #play-button {
-            width: 60px;
-            height: 60px;
-            background: var(--heading-color);
+        /* Mute Button */
+        #mute-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
-            border: none;
-            cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: all 0.2s;
-            opacity: 0.5;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: transform 0.2s;
         }
-        #play-button.ready {
-            opacity: 1;
-        }
-        #play-button.ready:hover {
+        #mute-button:hover {
             transform: scale(1.1);
         }
-        #play-button svg {
-            width: 24px;
-            height: 24px;
-            stroke: white;
-            stroke-width: 3;
-            fill: white;
+        #mute-button svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--heading-color);
         }
-        .icon-play { display: block; }
-        .icon-pause { display: none; }
-        #play-button.playing .icon-play { display: none; }
-        #play-button.playing .icon-pause { display: block; }
-
-        .song-info {
-            margin-top: calc(var(--spacing-base) * 2);
+        .icon-unmuted, .icon-muted {
+            display: none;
         }
-        .song-title {
-            font-family: var(--font-body);
-            font-size: 1.5rem;
-            color: var(--heading-color);
-        }
-        .song-artist {
-            font-family: sans-serif;
-            font-size: 0.9rem;
-            font-weight: 300;
-            color: var(--primary-text);
-        }
+        #mute-button.muted .icon-muted { display: block; }
+        #mute-button:not(.muted) .icon-unmuted { display: block; }
 
         /* Reasons Section */
         #reasons-chapter .chapter-content {
@@ -339,6 +309,12 @@
     </style>
 </head>
 <body>
+
+    <div id="mute-button" class="muted">
+        <svg class="icon-unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+    </div>
+
     <canvas id="hearts-canvas" style="position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none;"></canvas>
 
     <header class="hero">
@@ -420,22 +396,6 @@ Aur kehna toh bohot kuch hai, but samjh nahi aa raha kya kahu, kya likhu (pata n
 Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate every single thing you do for me 🤍 Thank you jaan for being such a wonderful friend, girlfriend, fiance and wife. 🤍 Thank you for thinking about me 🤍 Thank you for loving me 🤍 Thank you jaan for everything you do for me. 🤍 Thank you jaan for everything. 🤍</p>
             </div>
         </section>
-
-        <section class="chapter" id="song-chapter">
-            <div class="chapter-content">
-                <h2>Our Song</h2>
-                <div class="music-player">
-                    <button id="play-button" disabled>
-                        <svg class="icon-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                        <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-                    </button>
-                    <div class="song-info">
-                        <p class="song-title">Iraaday</p>
-                        <p class="song-artist">Abdul Hannan</p>
-                    </div>
-                </div>
-            </div>
-        </section>
         
         <section class="chapter" id="reasons-chapter">
             <div class="chapter-content">
@@ -455,40 +415,46 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- Audio Context ---
-            let mainSongPlayer, visualizerMeter;
-            let isVisualizerPlaying = false;
+            let musicStarted = false;
+            let backgroundMusic;
 
-            const playButton = document.getElementById('play-button');
+            const muteButton = document.getElementById('mute-button');
 
             const initAudio = async () => {
                 await Tone.start();
-                visualizerMeter = new Tone.Meter();
-                mainSongPlayer = new Tone.Player({
-                    url: "https://cdn.jsdelivr.net/gh/khotmoin/Iraaday@main/Iraaday.mp3",
-                    loop: true,
-                    onload: () => {
-                        playButton.classList.add('ready');
-                        playButton.disabled = false;
-                    }
-                }).connect(visualizerMeter).toDestination();
+                // Background Melody
+                backgroundMusic = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: 'fatsine' },
+                    envelope: { attack: 0.1, decay: 0.2, sustain: 0.5, release: 1 },
+                }).toDestination();
+                backgroundMusic.volume.value = -18;
+                const bgMelody = [['C4', 'E4', 'G4'], null, 'A4', null, ['G4', 'B3', 'D4'], null, 'E4', null];
+                new Tone.Sequence((time, note) => {
+                    if (note) backgroundMusic.triggerAttackRelease(note, '1n', time);
+                }, bgMelody, '1m').start(0);
+                
+                Tone.Transport.bpm.value = 70;
+                Tone.Transport.start();
             };
 
-            playButton.addEventListener('click', async () => {
-                if (!mainSongPlayer) {
+            const toggleMusic = async () => {
+                if (!musicStarted) {
                     await initAudio();
+                    musicStarted = true;
                 }
-                
-                if (!mainSongPlayer.loaded) return;
-                
-                const isPlaying = playButton.classList.toggle('playing');
-                isVisualizerPlaying = isPlaying;
+                const isMuted = muteButton.classList.toggle('muted');
+                Tone.Master.mute = isMuted;
+            };
 
-                if (isPlaying) {
-                    mainSongPlayer.start();
-                } else {
-                    mainSongPlayer.stop();
+            muteButton.addEventListener('click', toggleMusic);
+            document.body.addEventListener('click', () => {
+                if (!musicStarted) {
+                   // Don't auto-play, just prepare the context. Let mute button handle play/pause.
+                   initAudio();
+                   musicStarted = true;
                 }
-            });
+            }, { once: true });
+
 
             // --- Floating Hearts Canvas Animation ---
             const canvas = document.getElementById('hearts-canvas');
@@ -534,11 +500,6 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
                 const scrollDelta = window.scrollY - lastScrollY;
                 lastScrollY = window.scrollY;
 
-                let visualizerValue = -Infinity;
-                if (isVisualizerPlaying && visualizerMeter) {
-                    visualizerValue = visualizerMeter.getValue();
-                }
-
                 for (let i = 0; i < hearts.length; i++) {
                     let dx = mouse.x - hearts[i].x;
                     let dy = mouse.y - hearts[i].y;
@@ -548,14 +509,7 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
                         hearts[i].y -= dy * 0.05;
                     }
 
-                    // Visualizer Pulse Effect
-                    if (isVisualizerPlaying && i % 3 === 0) {
-                        const pulse = Tone.dbToGain(visualizerValue) * 20;
-                        hearts[i].size = hearts[i].baseSize + pulse;
-                    } else {
-                        hearts[i].size = hearts[i].baseSize;
-                    }
-
+                    hearts[i].size = hearts[i].baseSize;
                     hearts[i].y -= hearts[i].speedY + (scrollDelta * 0.2);
                     hearts[i].x += hearts[i].speedX;
 
@@ -634,13 +588,8 @@ Thank you for coming into my life, Tasbiha 🤍 I appreciate you, I appreciate e
                             }
                         });
                         
-                        if (chapter.id !== 'reasons-chapter' && chapter.id !== 'song-chapter') {
+                        if (chapter.id !== 'reasons-chapter') {
                            observer.unobserve(chapter);
-                        }
-                    } else {
-                        // Stop visualizer when scrolling away
-                        if (entry.target.id === 'song-chapter' && isVisualizerPlaying) {
-                            playButton.click();
                         }
                     }
                 });
